@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -37,6 +38,23 @@ func writeYaml(filePath string, data ReleaseData) error {
 	}
 
 	return ioutil.WriteFile(filePath, content, 0644)
+}
+
+func writePrefixedYaml(filePath string, data ReleaseData) error {
+	content, err := yaml.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	lines := strings.Split(string(content), "\n")
+	for i := range lines {
+		if lines[i] != "" {
+			lines[i] = ":todo_added:\t" + lines[i]
+		}
+	}
+	prefixedContent := strings.Join(lines, "\n")
+
+	return ioutil.WriteFile(filePath, []byte(prefixedContent), 0644)
 }
 
 func fileExists(path string) bool {
@@ -89,7 +107,6 @@ func main() {
 
 	forwardPortData := make(ReleaseData)
 
-	fmt.Println("Charts with 'forward-port', 'port', 'forward', or 'port-forward' in the commit message:")
 	for _, key := range keys {
 		for _, version := range data[key] {
 			filename := fmt.Sprintf("%s-%s.tgz", key, version)
@@ -97,11 +114,9 @@ func main() {
 			if fileExists(filePath) {
 				commitMsg, err := checkLastCommitMessage(filePath)
 				if err != nil {
-					fmt.Printf("Error checking commit for %s: %v\n", filename, err)
 					continue
 				}
 				if hasCommitWords(commitMsg) {
-					fmt.Printf("Chart: %s Version: %s - Commit Message: %s\n", key, version, commitMsg)
 					forwardPortData[key] = append(forwardPortData[key], version)
 					delete(data, key)
 				}
@@ -114,14 +129,7 @@ func main() {
 		log.Fatalf("Error writing to forward-port.yaml: %v", err)
 	}
 
-	startData := make(ReleaseData)
-	for key, versions := range data {
-		for _, version := range versions {
-			startData[key] = append(startData[key], ":todo_added:  "+version)
-		}
-	}
-
-	err = writeYaml(startFilePath, startData)
+	err = writePrefixedYaml(startFilePath, data)
 	if err != nil {
 		log.Fatalf("Error writing to start.yaml: %v", err)
 	}
