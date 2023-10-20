@@ -72,6 +72,8 @@ func main() {
 
 	// Filter data based on commit messages
 	filteredData := make(ReleaseData)
+
+	fmt.Println("Charts with commit words (forward/port):")
 	for chart, versions := range data {
 		for _, version := range versions {
 			filename := fmt.Sprintf("%s-%s.tgz", chart, version)
@@ -81,12 +83,30 @@ func main() {
 				if err != nil {
 					continue
 				}
-				if !strings.Contains(commitMsg, "forward") && !strings.Contains(commitMsg, "port") {
+
+				if strings.Contains(commitMsg, "forward") || strings.Contains(commitMsg, "port") {
+					fmt.Printf("Chart: %s, Version: %s, Commit Message: %s\n", chart, version, commitMsg)
+				} else {
 					if _, ok := filteredData[chart]; !ok {
 						filteredData[chart] = []string{}
 					}
 					filteredData[chart] = append(filteredData[chart], version)
 				}
+			}
+		}
+	}
+
+	fmt.Println("\nCharts without commit words (forward/port):")
+	for chart, versions := range filteredData {
+		for _, version := range versions {
+			filename := fmt.Sprintf("%s-%s.tgz", chart, version)
+			filePath := filepath.Join(assetsDir, chart, filename)
+			if fileExists(filePath) {
+				commitMsg, err := checkLastCommitMessage(filePath)
+				if err != nil {
+					continue
+				}
+				fmt.Printf("Chart: %s, Version: %s, Commit Message: %s\n", chart, version, commitMsg)
 			}
 		}
 	}
