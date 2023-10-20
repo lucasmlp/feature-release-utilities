@@ -1,113 +1,65 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io/fs"
+	"io/ioutil"
+	"log"
 	"os"
-	"os/exec"
-	"strings"
+	"path/filepath"
+	"sort"
+
+	"gopkg.in/yaml.v2"
 )
 
 type ReleaseData map[string][]string
 
-func main() {
-	localFilePath := "/Users/machado/development/suse/charts/release.yaml"
-	assetsDir := "/Users/machado/development/suse/charts/assets"
-
-	localData, err := readYaml(localFilePath)
-	if err != nil {
-		fmt.Printf("Error reading %s: %s\n", localFilePath, err)
-		return
-	}
-
-	fmt.Printf("Number of items in %s: %d\n", localFilePath, len(localData))
-
-	nonCRDCount := countNonCRDCharts(localData)
-	fmt.Printf("Number of charts without -crd suffix: %d\n", nonCRDCount)
-
-	checkCommitMessages(assetsDir, localData)
-}
-
 func readYaml(filePath string) (ReleaseData, error) {
-	file, err := os.Open(filePath)
+	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
 
-	data := make(ReleaseData)
-	var key string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasSuffix(line, ":") {
-			key = strings.TrimSuffix(line, ":")
-			data[key] = []string{}
-		} else if len(line) > 2 {
-			version := strings.TrimSpace(line[2:])
-			data[key] = append(data[key], version)
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
+	var data ReleaseData
+	if err := yaml.Unmarshal(content, &data); err != nil {
 		return nil, err
 	}
 
 	return data, nil
 }
 
-func countNonCRDCharts(data ReleaseData) int {
-	count := 0
-	for key := range data {
-		if !strings.HasSuffix(key, "-crd") {
-			count++
-		}
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
 	}
-	return count
+	return !info.IsDir()
 }
 
-func isPresentInReleaseData(fileName string, releaseData ReleaseData) bool {
-	for chartName, versions := range releaseData {
-		for _, version := range versions {
-			expectedFileName := fmt.Sprintf("%s-%s.tgz", chartName, version)
-			if strings.HasSuffix(fileName, expectedFileName) {
-				return true
-			}
-		}
-	}
-	return false
-}
+func main() {
+	releaseFilePath := "/Users/machado/development/suse/charts/release.yaml"
+	assetsDir := "/Users/machado/development/suse/charts/assets"
 
-func checkCommitMessages(directory string, releaseData ReleaseData) {
-	fmt.Println("\nChecking commit messages...")
-
-	err := fs.WalkDir(os.DirFS(directory), ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
-			return nil
-		}
-
-		if isPresentInReleaseData(d.Name(), releaseData) {
-			cmd := exec.Command("git", "log", "-1", "--oneline", "--", path)
-			cmd.Dir = directory
-			out, err := cmd.Output()
-			if err != nil {
-				fmt.Printf("Error while checking the git log for %s: %s\n", path, err)
-				return nil
-			}
-
-			commitMessage := strings.TrimSpace(string(out))
-			if strings.Contains(commitMessage, "forward") || strings.Contains(commitMessage, "port") {
-				fmt.Printf("Chart affected: %s\nCommit Message: %s\n\n", d.Name(), commitMessage)
-			}
-		}
-		return nil
-	})
-
+	data, err := readYaml(releaseFilePath)
 	if err != nil {
-		fmt.Printf("Error traversing the directory: %s\n", err)
+		log.Fatalf("Error reading YAML file: %v", err)
+	}
+
+	keys := make([]string, 0, len(data))
+	for key := range data {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	fmt.Println("Checking assets for each chart:")
+	for _, key := range keys {
+		for _, version := range data[key] {
+			filename := fmt.Sprintf("%s-%s.tgz", key, version)
+			filePath := filepath.Join(assetsDir, key, filename)
+			if fileExists(filePath) {
+				fmt.Printf("Found: %s\n", filename)
+			} else {
+				fmt.Printf("Not found: %s\n", filename)
+			}
+		}
 	}
 }
