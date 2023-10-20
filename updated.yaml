@@ -1,0 +1,142 @@
+:todo_added:	epinio:
+:todo_added:	- 102.0.4+up1.9.0
+:todo_added:	- 103.0.0+up1.8.1
+:todo_added:	- 103.0.1+up1.9.0
+:todo_added:	- 103.0.2+up1.10.0
+:todo_added:	longhorn:
+:todo_added:	- 103.0.0+up1.3.3
+:todo_added:	- 103.1.0+up1.4.3
+:todo_added:	- 103.2.0+up1.5.1
+:todo_added:	longhorn-crd:
+:todo_added:	- 103.0.0+up1.3.3
+:todo_added:	- 103.1.0+up1.4.3
+:todo_added:	- 103.2.0+up1.5.1
+:todo_added:	prometheus-federator:
+:todo_added:	- 0.3.0+up0.3.3
+:todo_added:	- 103.0.0+up0.4.0
+:todo_added:	rancher-alerting-drivers:
+:todo_added:	- 103.0.0
+:todo_added:	rancher-cis-benchmark-crd:
+:todo_added:	- 4.2.0
+:todo_added:	- 5.0.0-rc3
+:todo_added:	rancher-gatekeeper:
+:todo_added:	- 103.1.0+up3.13.0
+:todo_added:	rancher-gke-operator-crd:
+:todo_added:	- 102.0.2+up1.1.6
+:todo_added:	- 103.0.1+up1.2.0-rc2
+:todo_done:	rancher-provisioning-capi:
+:todo_done:	- 100.0.0+up0.0.1
+:todo_done:	- 103.0.0+up0.0.1
+:todo_done:	rancher-vsphere-cpi:
+:todo_done:	- 103.0.0+up1.6.0
+:todo_done:	rancher-windows-gmsa:
+:todo_done:	- 3.0.0
+:todo_added:	sriov-crd:
+:todo_added:	- 103.0.0+up0.1.0
+:todo_done:	system-upgrade-controller:
+:todo_done:	- 103.0.0+up0.6.0
+:todo_added:	elemental-crd:
+:todo_added:	- 103.0.0+up1.3.4
+:todo_added:	epinio-crd:
+:todo_added:	- 102.0.4+up1.9.0
+:todo_added:	- 103.0.0+up1.8.1
+:todo_added:	- 103.0.1+up1.9.0
+:todo_added:	- 103.0.2+up1.10.0
+:todo_added:	rancher-aks-operator:
+:todo_added:	- 102.3.2+up1.1.3
+:todo_added:	- 103.0.0+up1.2.0-rc4
+:todo_added:	rancher-eks-operator-crd:
+:todo_added:	- 102.1.4+up1.2.2
+:todo_added:	- 103.0.0+up1.3.0-rc4
+:todo_added:	fleet:
+:todo_added:	- 102.1.1+up0.7.1
+:todo_added:	- 102.2.0+up0.8.0
+:todo_added:	- 103.1.0+up0.9.0-rc.5
+:todo_added:	fleet-agent:
+:todo_added:	- 102.1.1+up0.7.1
+:todo_added:	- 102.2.0+up0.8.0
+:todo_added:	- 103.1.0+up0.9.0-rc.5
+:todo_added:	rancher-backup-crd:
+:todo_added:	- 102.0.2+up3.1.2
+:todo_added:	- 103.0.0+up4.0.0-rc1
+:todo_added:	rancher-istio:
+:todo_added:	- 102.3.0+up1.18.2
+:todo_added:	- 103.1.0+up1.18.2
+:todo_added:	- 103.2.0+up1.19.0
+:todo_added:	rancher-logging:
+:todo_added:	- 103.0.0+up3.17.10
+:todo_added:	rancher-monitoring:
+:todo_added:	- 102.0.2+up40.1.2
+:todo_added:	- 103.0.0+up45.31.1
+:todo_added:	rancher-project-monitoring:
+:todo_added:	- 0.3.0+up0.3.3
+:todo_added:	sriov:
+:todo_added:	- 103.0.0+up0.1.0
+:todo_added:	ui-plugin-operator-crd:
+:todo_added:	- 102.0.2+up0.2.1
+:todo_added:	- 103.0.1+up0.2.1
+:todo_added:	fleet-crd:
+:todo_added:	- 102.1.1+up0.7.1
+:todo_added:	- 102.2.0+up0.8.0
+:todo_added:	- 103.1.0+up0.9.0-rc.5
+:todo_added:	rancher-backup:
+:todo_added:	- 102.0.2+up3.1.2
+:todo_added:	- 103.0.0+up4.0.0-rc1
+:todo_added:	rancher-csp-adapter:
+:todo_added:	- 103.0.0+up3.0.0-rc2
+:todo_added:	rancher-monitoring-crd:
+:todo_added:	- 102.0.2+up40.1.2
+:todo_added:	- 103.0.0+up45.31.1
+:todo_added:	elemental:
+:todo_added:	- 103.0.0+up1.3.4
+:todo_added:	neuvector:
+:todo_added:	- 102.0.4+up2.6.2
+:todo_added:	- 102.0.5+up2.6.4
+:todo_added:	- 103.0.0+up2.6.4
+:todo_added:	rancher-aks-operator-crd:
+:todo_added:	- 102.3.2+up1.1.3
+:todo_added:	- 103.0.0+up1.2.0-rc4
+:todo_added:	rancher-cis-benchmark:
+:todo_added:	- 4.2.0
+:todo_added:	- 5.0.0-rc3
+:todo_added:	rancher-gatekeeper-crd:
+:todo_added:	- 103.1.0+up3.13.0
+:todo_added:	rancher-pushprox:
+:todo_added:	- 103.0.0
+:todo_added:	neuvector-crd:
+:todo_added:	- 102.0.4+up2.6.2
+:todo_added:	- 102.0.5+up2.6.4
+:todo_added:	- 103.0.0+up2.6.4
+:todo_added:	rancher-gke-operator:
+:todo_added:	- 102.0.2+up1.1.6
+:todo_added:	- 103.0.1+up1.2.0-rc2
+:todo_added:	rancher-webhook:
+:todo_added:	- 2.0.6+up0.3.6
+:todo_added:	- 103.0.0+up0.4.0-rc10
+:todo_added:	harvester-cloud-provider:
+:todo_added:	- 103.0.0+up0.1.14
+:todo_added:	harvester-csi-driver:
+:todo_added:	- 103.0.0+up0.1.16
+:todo_added:	neuvector-monitor:
+:todo_added:	- 102.0.4+up2.6.2
+:todo_added:	- 102.0.5+up2.6.4
+:todo_added:	- 103.0.0+up2.6.4
+:todo_added:	rancher-external-ip-webhook:
+:todo_added:	- 0.1.400
+:todo_added:	- 0.1.600
+:todo_added:	- 0.1.601
+:todo_added:	- 100.0.0+up1.0.0
+:todo_added:	- 100.0.1+up1.0.1
+:todo_added:	- 100.0.2+up1.0.1
+:todo_added:	ui-plugin-operator:
+:todo_added:	- 102.0.2+up0.2.1
+:todo_added:	- 103.0.1+up0.2.1
+:todo_added:	rancher-eks-operator:
+:todo_added:	- 102.1.4+up1.2.2
+:todo_added:	- 103.0.0+up1.3.0-rc4
+:todo_added:	rancher-logging-crd:
+:todo_added:	- 103.0.0+up3.17.10
+:todo_done:	rancher-vsphere-csi:
+:todo_done:	- 103.0.0+up3.0.2-rancher1
+:todo_done:	rancher-windows-gmsa-crd:
+:todo_done:	- 3.0.0

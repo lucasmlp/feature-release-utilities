@@ -1,0 +1,13 @@
+system-upgrade-controller:
+  - 103.0.0+up0.6.0
+rancher-vsphere-cpi:
+  - 103.0.0+up1.6.0
+rancher-vsphere-csi:
+  - 103.0.0+up3.0.2-rancher1
+rancher-windows-gmsa:
+  - 3.0.0
+rancher-windows-gmsa-crd:
+  - 3.0.0
+rancher-provisioning-capi:
+  - 100.0.0+up0.0.1
+  - 103.0.0+up0.0.1
