@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -28,16 +30,13 @@ func readYaml(filePath string) (ReleaseData, error) {
 	return data, nil
 }
 
-func writeYaml(filePath string, data ReleaseData, prefix string) error {
-	var content string
-	for chart, versions := range data {
-		content += prefix + chart + ":\n"
-		for _, version := range versions {
-			content += prefix + "  - " + version + "\n"
-		}
+func writeYaml(filePath string, data ReleaseData) error {
+	content, err := yaml.Marshal(data)
+	if err != nil {
+		return err
 	}
 
-	return ioutil.WriteFile(filePath, []byte(content), 0644)
+	return ioutil.WriteFile(filePath, content, 0644)
 }
 
 func fileExists(path string) bool {
@@ -63,63 +62,62 @@ func checkLastCommitMessage(filePath string) (string, error) {
 func main() {
 	releaseFilePath := "/Users/machado/development/suse/charts/release.yaml"
 	assetsDir := "/Users/machado/development/suse/charts/assets"
+	startFilePath := "start.yaml"
+	filteredFilePath := "filtered.yaml"
+	forwardPortFilePath := "forward-port.yaml"
 
-	// Read release.yaml
 	data, err := readYaml(releaseFilePath)
 	if err != nil {
-		panic(fmt.Sprintf("Error reading YAML file: %v", err))
+		log.Fatalf("Error reading YAML file: %v", err)
 	}
 
-	// Filter data based on commit messages
-	filteredData := make(ReleaseData)
+	keys := make([]string, 0, len(data))
+	for key := range data {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
 
-	fmt.Println("Charts with commit words (forward/port):")
-	for chart, versions := range data {
-		for _, version := range versions {
-			filename := fmt.Sprintf("%s-%s.tgz", chart, version)
-			filePath := filepath.Join(assetsDir, chart, filename)
+	forwardPortData := make(ReleaseData)
+
+	fmt.Println("Charts with 'forward' or 'port' in the commit message:")
+	for _, key := range keys {
+		for _, version := range data[key] {
+			filename := fmt.Sprintf("%s-%s.tgz", key, version)
+			filePath := filepath.Join(assetsDir, key, filename)
 			if fileExists(filePath) {
 				commitMsg, err := checkLastCommitMessage(filePath)
 				if err != nil {
+					fmt.Printf("Error checking commit for %s: %v\n", filename, err)
 					continue
 				}
-
 				if strings.Contains(commitMsg, "forward") || strings.Contains(commitMsg, "port") {
-					fmt.Printf("Chart: %s, Version: %s, Commit Message: %s\n", chart, version, commitMsg)
-				} else {
-					if _, ok := filteredData[chart]; !ok {
-						filteredData[chart] = []string{}
-					}
-					filteredData[chart] = append(filteredData[chart], version)
+					fmt.Printf("Chart: %s Version: %s - Commit Message: %s\n", key, version, commitMsg)
+					forwardPortData[key] = append(forwardPortData[key], version)
+					delete(data, key)
 				}
 			}
 		}
 	}
 
-	fmt.Println("\nCharts without commit words (forward/port):")
-	for chart, versions := range filteredData {
+	err = writeYaml(forwardPortFilePath, forwardPortData)
+	if err != nil {
+		log.Fatalf("Error writing to forward-port.yaml: %v", err)
+	}
+
+	startData := make(ReleaseData)
+	for key, versions := range data {
 		for _, version := range versions {
-			filename := fmt.Sprintf("%s-%s.tgz", chart, version)
-			filePath := filepath.Join(assetsDir, chart, filename)
-			if fileExists(filePath) {
-				commitMsg, err := checkLastCommitMessage(filePath)
-				if err != nil {
-					continue
-				}
-				fmt.Printf("Chart: %s, Version: %s, Commit Message: %s\n", chart, version, commitMsg)
-			}
+			startData[key] = append(startData[key], ":todo_added:  "+version)
 		}
 	}
 
-	// Write filtered.yaml without prefix
-	err = writeYaml("filtered.yaml", filteredData, "")
+	err = writeYaml(startFilePath, startData)
 	if err != nil {
-		panic(fmt.Sprintf("Error writing filtered.yaml: %v", err))
+		log.Fatalf("Error writing to start.yaml: %v", err)
 	}
 
-	// Write start.yaml with :todo_added: prefix and two spaces
-	err = writeYaml("start.yaml", filteredData, ":todo_added:  ")
+	err = writeYaml(filteredFilePath, data)
 	if err != nil {
-		panic(fmt.Sprintf("Error writing start.yaml: %v", err))
+		log.Fatalf("Error writing to filtered.yaml: %v", err)
 	}
 }
