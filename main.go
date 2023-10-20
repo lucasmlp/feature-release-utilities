@@ -8,8 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -59,6 +59,16 @@ func checkLastCommitMessage(filePath string) (string, error) {
 	return out.String(), nil
 }
 
+func hasCommitWords(commitMsg string) bool {
+	words := []string{"\\bforward-port\\b", "\\bport\\b", "\\bforward\\b", "\\bport-forward\\b"}
+	for _, word := range words {
+		if regexp.MustCompile(word).MatchString(commitMsg) {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
 	releaseFilePath := "/Users/machado/development/suse/charts/release.yaml"
 	assetsDir := "/Users/machado/development/suse/charts/assets"
@@ -79,7 +89,7 @@ func main() {
 
 	forwardPortData := make(ReleaseData)
 
-	fmt.Println("Charts with 'forward' or 'port' in the commit message:")
+	fmt.Println("Charts with 'forward-port', 'port', 'forward', or 'port-forward' in the commit message:")
 	for _, key := range keys {
 		for _, version := range data[key] {
 			filename := fmt.Sprintf("%s-%s.tgz", key, version)
@@ -90,7 +100,7 @@ func main() {
 					fmt.Printf("Error checking commit for %s: %v\n", filename, err)
 					continue
 				}
-				if strings.Contains(commitMsg, "forward") || strings.Contains(commitMsg, "port") {
+				if hasCommitWords(commitMsg) {
 					fmt.Printf("Chart: %s Version: %s - Commit Message: %s\n", key, version, commitMsg)
 					forwardPortData[key] = append(forwardPortData[key], version)
 					delete(data, key)
