@@ -4,11 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -30,13 +28,16 @@ func readYaml(filePath string) (ReleaseData, error) {
 	return data, nil
 }
 
-func writeYaml(filePath string, data ReleaseData) error {
-	encodedData, err := yaml.Marshal(data)
-	if err != nil {
-		return err
+func writeYaml(filePath string, data ReleaseData, prefix string) error {
+	var content string
+	for chart, versions := range data {
+		content += prefix + chart + ":\n"
+		for _, version := range versions {
+			content += prefix + "  - " + version + "\n"
+		}
 	}
 
-	return ioutil.WriteFile(filePath, encodedData, 0644)
+	return ioutil.WriteFile(filePath, []byte(content), 0644)
 }
 
 func fileExists(path string) bool {
@@ -63,51 +64,42 @@ func main() {
 	releaseFilePath := "/Users/machado/development/suse/charts/release.yaml"
 	assetsDir := "/Users/machado/development/suse/charts/assets"
 
+	// Read release.yaml
 	data, err := readYaml(releaseFilePath)
 	if err != nil {
-		log.Fatalf("Error reading YAML file: %v", err)
+		panic(fmt.Sprintf("Error reading YAML file: %v", err))
 	}
 
-	keys := make([]string, 0, len(data))
-	for key := range data {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-
-	affectedCharts := make(map[string][]string)
-
-	for _, key := range keys {
-		for _, version := range data[key] {
-			filename := fmt.Sprintf("%s-%s.tgz", key, version)
-			filePath := filepath.Join(assetsDir, key, filename)
+	// Filter data based on commit messages
+	filteredData := make(ReleaseData)
+	for chart, versions := range data {
+		for _, version := range versions {
+			filename := fmt.Sprintf("%s-%s.tgz", chart, version)
+			filePath := filepath.Join(assetsDir, chart, filename)
 			if fileExists(filePath) {
 				commitMsg, err := checkLastCommitMessage(filePath)
 				if err != nil {
-					fmt.Printf("Error checking commit for %s: %v\n", filename, err)
 					continue
 				}
-				if strings.Contains(commitMsg, "forward") || strings.Contains(commitMsg, "port") {
-					affectedCharts[key] = append(affectedCharts[key], version)
+				if !strings.Contains(commitMsg, "forward") && !strings.Contains(commitMsg, "port") {
+					if _, ok := filteredData[chart]; !ok {
+						filteredData[chart] = []string{}
+					}
+					filteredData[chart] = append(filteredData[chart], version)
 				}
-			} else {
-				fmt.Printf("Not found: %s\n", filename)
 			}
 		}
 	}
 
-	// Create a filtered release data by excluding affected charts
-	filteredReleaseData := make(ReleaseData)
-	for key, versions := range data {
-		if _, exists := affectedCharts[key]; !exists {
-			filteredReleaseData[key] = versions
-		}
-	}
-
-	// Write filtered data to release-filtered.yaml in the current working directory
-	err = writeYaml("release-filtered.yaml", filteredReleaseData)
+	// Write filtered.yaml without prefix
+	err = writeYaml("filtered.yaml", filteredData, "")
 	if err != nil {
-		log.Fatalf("Error writing to release-filtered.yaml: %v", err)
+		panic(fmt.Sprintf("Error writing filtered.yaml: %v", err))
 	}
 
-	fmt.Println("release-filtered.yaml has been generated successfully.")
+	// Write start.yaml with :todo_added: prefix and two spaces
+	err = writeYaml("start.yaml", filteredData, ":todo_added:  ")
+	if err != nil {
+		panic(fmt.Sprintf("Error writing start.yaml: %v", err))
+	}
 }
