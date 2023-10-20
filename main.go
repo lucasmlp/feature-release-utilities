@@ -30,6 +30,15 @@ func readYaml(filePath string) (ReleaseData, error) {
 	return data, nil
 }
 
+func writeYaml(filePath string, data ReleaseData) error {
+	encodedData, err := yaml.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(filePath, encodedData, 0644)
+}
+
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
@@ -65,7 +74,8 @@ func main() {
 	}
 	sort.Strings(keys)
 
-	fmt.Println("Checking assets for each chart:")
+	affectedCharts := make(map[string][]string)
+
 	for _, key := range keys {
 		for _, version := range data[key] {
 			filename := fmt.Sprintf("%s-%s.tgz", key, version)
@@ -77,11 +87,27 @@ func main() {
 					continue
 				}
 				if strings.Contains(commitMsg, "forward") || strings.Contains(commitMsg, "port") {
-					fmt.Printf("Chart: %s Version: %s has commit message containing 'forward' or 'port'. Message: %s\n", key, version, commitMsg)
+					affectedCharts[key] = append(affectedCharts[key], version)
 				}
 			} else {
 				fmt.Printf("Not found: %s\n", filename)
 			}
 		}
 	}
+
+	// Create a filtered release data by excluding affected charts
+	filteredReleaseData := make(ReleaseData)
+	for key, versions := range data {
+		if _, exists := affectedCharts[key]; !exists {
+			filteredReleaseData[key] = versions
+		}
+	}
+
+	// Write filtered data to release-filtered.yaml in the current working directory
+	err = writeYaml("release-filtered.yaml", filteredReleaseData)
+	if err != nil {
+		log.Fatalf("Error writing to release-filtered.yaml: %v", err)
+	}
+
+	fmt.Println("release-filtered.yaml has been generated successfully.")
 }
