@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -24,39 +28,53 @@ func readYaml(filePath string) (ReleaseData, error) {
 	return data, nil
 }
 
-func generatePrefixedYaml(data ReleaseData, qaData ReleaseData) string {
-	var lines []string
-	for chart, versions := range data {
-		prefix := ":todo_added:\t"
-		if _, exists := qaData[chart]; exists {
-			prefix = ":todo_done:\t"
-		}
-		lines = append(lines, prefix+chart+":")
-		for _, version := range versions {
-			lines = append(lines, prefix+"- "+version)
-		}
+func checkLastCommitMessage(filePath string) (string, error) {
+	cmd := exec.Command("git", "log", "-n", "1", "--pretty=format:%s", filePath)
+	cmd.Dir = filepath.Dir(filePath)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return "", err
 	}
-	return strings.Join(lines, "\n")
+	return out.String(), nil
 }
 
 func main() {
 	releaseFilePath := "/Users/machado/development/suse/charts/release.yaml"
-	qaSignoffFilePath := "qa-signoff.yaml"
-	updatedFilePath := "updated.yaml"
+	assetsDir := "/Users/machado/development/suse/charts/assets"
 
 	data, err := readYaml(releaseFilePath)
 	if err != nil {
 		log.Fatalf("Error reading release.yaml: %v", err)
 	}
 
-	qaData, err := readYaml(qaSignoffFilePath)
-	if err != nil {
-		log.Fatalf("Error reading qa-signoff.yaml: %v", err)
+	var forwardPortedLines, notForwardPortedLines []string
+	for chart, versions := range data {
+		for _, version := range versions {
+			filename := fmt.Sprintf("%s-%s.tgz", chart, version)
+			filePath := filepath.Join(assetsDir, chart, filename)
+			commitMsg, err := checkLastCommitMessage(filePath)
+			if err != nil {
+				log.Printf("Error checking commit for %s: %v\n", filename, err)
+				continue
+			}
+			commitWords := []string{"forward-port", "port", "forward", "port-forward"}
+			isForwardPorted := false
+			for _, word := range commitWords {
+				if strings.Contains(commitMsg, word) {
+					isForwardPorted = true
+					break
+				}
+			}
+			if isForwardPorted {
+				forwardPortedLines = append(forwardPortedLines, fmt.Sprintf("%s %s: %s", chart, version, commitMsg))
+			} else {
+				notForwardPortedLines = append(notForwardPortedLines, fmt.Sprintf("%s %s: %s", chart, version, commitMsg))
+			}
+		}
 	}
 
-	updatedContent := generatePrefixedYaml(data, qaData)
-	err = ioutil.WriteFile(updatedFilePath, []byte(updatedContent), 0644)
-	if err != nil {
-		log.Fatalf("Error writing to updated.yaml: %v", err)
-	}
+	ioutil.WriteFile("forward-port.log", []byte(strings.Join(forwardPortedLines, "\n")), 0644)
+	ioutil.WriteFile("filtered.log", []byte(strings.Join(notForwardPortedLines, "\n")), 0644)
 }

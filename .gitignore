@@ -3,3 +3,4 @@ filtered.yaml
 start.yaml
 forward-port.yaml
 updated.yaml
+*.log
