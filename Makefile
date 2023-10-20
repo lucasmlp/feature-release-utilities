@@ -1,7 +1,7 @@
 .PHONY: build run clean
 
 # Name of the binary we'll produce
-BINARY_NAME=countCharts
+BINARY_NAME=feature-release-utils
 
 all: build run
 
