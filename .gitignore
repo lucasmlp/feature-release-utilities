@@ -1,10 +1,5 @@
 feature-release-utils
-filtered.yaml
-start.yaml
-forward-port.yaml
-updated.yaml
 *.log
-chart-owners.yaml
-released.yaml
-toBeReleased.yaml
+*.yaml
+chart
 build
