@@ -6,4 +6,5 @@ updated.yaml
 *.log
 chart-owners.yaml
 released.yaml
+toBeReleased.yaml
 build
