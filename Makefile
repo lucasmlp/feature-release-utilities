@@ -1,21 +1,25 @@
-.PHONY: build run clean
+# Makefile
 
-# Name of the binary we'll produce
-BINARY_NAME=feature-release-utils
+BINARY_NAME=chartcli
+SOURCE_DIR=./
+BUILD_DIR=./build
 
-all: build run
+all: build
 
-# Build the Go code into a binary
 build:
 	@echo "Building..."
-	@go build -o $(BINARY_NAME)
+	go build -o $(BUILD_DIR)/$(BINARY_NAME) $(SOURCE_DIR)
 
-# Run the binary
 run: build
 	@echo "Running..."
-	@./$(BINARY_NAME)
+	$(BUILD_DIR)/$(BINARY_NAME) generate
 
-# Clean up the built binary
+to-be-released: build
+	@echo "Running..."
+	$(BUILD_DIR)/$(BINARY_NAME) tobereleased
+
 clean:
 	@echo "Cleaning up..."
-	@rm -f $(BINARY_NAME)
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all build run clean
