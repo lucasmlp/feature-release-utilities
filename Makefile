@@ -1,25 +1,20 @@
-# Makefile
-
 BINARY_NAME=chartcli
-SOURCE_DIR=./
-BUILD_DIR=./build
+BUILD_DIR=build
+PROJECT_ROOT=github.com/lucasmlp/release-yaml-utils
+
+.PHONY: all build clean generate tobereleased
 
 all: build
 
 build:
-	@echo "Building..."
-	go build -o $(BUILD_DIR)/$(BINARY_NAME) $(SOURCE_DIR)
+	@mkdir -p $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/chartcli
 
-run: build
-	@echo "Running..."
-	$(BUILD_DIR)/$(BINARY_NAME) generate
+generate:
+	@$(BUILD_DIR)/$(BINARY_NAME) generate
 
-to-be-released: build
-	@echo "Running..."
-	$(BUILD_DIR)/$(BINARY_NAME) tobereleased
+tobereleased:
+	@$(BUILD_DIR)/$(BINARY_NAME) tobereleased
 
 clean:
-	@echo "Cleaning up..."
-	rm -rf $(BUILD_DIR)
-
-.PHONY: all build run clean
+	@rm -rf $(BUILD_DIR)
