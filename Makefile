@@ -2,7 +2,7 @@ BINARY_NAME=chartcli
 BUILD_DIR=build
 PROJECT_ROOT=github.com/lucasmlp/release-yaml-utils
 
-.PHONY: all build clean generate tobereleased
+.PHONY: all build clean generate tobereleased count
 
 all: build
 
@@ -18,3 +18,6 @@ tobereleased:
 
 clean:
 	@rm -rf $(BUILD_DIR)
+
+count:
+	@$(BUILD_DIR)/$(BINARY_NAME) count
