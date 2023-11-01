@@ -9,9 +9,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var releaseFilePath = "/Users/machado/development/suse/charts/release.yaml"
+var releasedFilePath = "released.yaml"
+var toBeReleasedFilePath = "toBeReleased.yaml"
+
 var rootCmd = &cobra.Command{
 	Use:   "chartcli",
 	Short: "CLI tool for charts management",
+}
+
+var countCmd = &cobra.Command{
+	Use:   "count",
+	Short: "Count the number of versions for charts in release.yaml, released.yaml and toBeReleased.yaml",
+	Run:   executeCount,
 }
 
 func main() {
@@ -25,29 +35,28 @@ func main() {
 	}
 }
 
-var releaseFilePath = "/Users/machado/development/suse/charts/release.yaml"
-
-var countCmd = &cobra.Command{
-	Use:   "count",
-	Short: "Count the number of versions for charts in release.yaml and toBeReleased.yaml",
-	Run:   executeCount,
-}
-
 func executeCount(cmd *cobra.Command, args []string) {
 	releaseData, err := utils.ReadYaml(releaseFilePath)
 	if err != nil {
 		log.Fatalf("Error reading release.yaml: %v", err)
 	}
 
-	toBeReleasedData, err := utils.ReadYaml("toBeReleased.yaml")
+	releasedData, err := utils.ReadYaml(releasedFilePath)
+	if err != nil {
+		log.Fatalf("Error reading released.yaml: %v", err)
+	}
+
+	toBeReleasedData, err := utils.ReadYaml(toBeReleasedFilePath)
 	if err != nil {
 		log.Fatalf("Error reading toBeReleased.yaml: %v", err)
 	}
 
 	releaseCount := countVersions(releaseData)
+	releasedCount := countVersions(releasedData)
 	toBeReleasedCount := countVersions(toBeReleasedData)
 
 	log.Printf("Number of versions in release.yaml: %d\n", releaseCount)
+	log.Printf("Number of versions in released.yaml: %d\n", releasedCount)
 	log.Printf("Number of versions in toBeReleased.yaml: %d\n", toBeReleasedCount)
 }
 
