@@ -2,22 +2,25 @@ BINARY_NAME=chartcli
 BUILD_DIR=build
 PROJECT_ROOT=github.com/lucasmlp/release-yaml-utils
 
-.PHONY: all build clean generate tobereleased count
+.PHONY: all build clean generate tobereleased count merge
 
-all: build
+all: build clean
+
+clean:
+	@rm -rf $(BUILD_DIR)
 
 build:
 	@mkdir -p $(BUILD_DIR)
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/chartcli
 
-generate:
+generate: build
 	@$(BUILD_DIR)/$(BINARY_NAME) generate
 
-tobereleased:
+tobereleased: build
 	@$(BUILD_DIR)/$(BINARY_NAME) tobereleased
 
-clean:
-	@rm -rf $(BUILD_DIR)
-
-count:
+count: build
 	@$(BUILD_DIR)/$(BINARY_NAME) count
+
+merge: build
+	@$(BUILD_DIR)/$(BINARY_NAME) merge

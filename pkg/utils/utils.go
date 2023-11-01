@@ -7,6 +7,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var ReleaseFilePath = "/Users/machado/development/suse/charts/release.yaml"
+var ReleasedFilePath = "released.yaml"
+var ToBeReleasedFilePath = "toBeReleased.yaml"
+
 func Contains(slice []string, item string) bool {
 	for _, a := range slice {
 		if a == item {
