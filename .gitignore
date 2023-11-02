@@ -1,5 +1,4 @@
 feature-release-utils
 *.log
-*.yaml
 chart
 build
