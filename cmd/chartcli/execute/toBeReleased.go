@@ -1,4 +1,4 @@
-package release
+package execute
 
 import (
 	"io/ioutil"
@@ -9,21 +9,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var ReleasedFilePath = "released.yaml"
-
-var ToBeReleasedCmd = &cobra.Command{
-	Use:   "tobereleased",
-	Short: "Generates a toBeReleased.yaml file with charts that have not been released.",
-	Run:   executeToBeReleased,
-}
-
-func executeToBeReleased(cmd *cobra.Command, args []string) {
+func ToBeReleased(cmd *cobra.Command, args []string) {
 	releaseData, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {
 		log.Fatalf("Error reading release.yaml: %v", err)
 	}
 
-	releasedData, err := utils.ReadYaml(ReleasedFilePath)
+	releasedData, err := utils.ReadYaml(utils.ReleasedFilePath)
 	if err != nil {
 		log.Fatalf("Error reading released.yaml: %v", err)
 	}

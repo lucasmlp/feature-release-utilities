@@ -9,9 +9,10 @@ import (
 
 	"github.com/lucasmlp/release-yaml-utils/pkg/git"
 	"github.com/lucasmlp/release-yaml-utils/pkg/utils"
+	"github.com/spf13/cobra"
 )
 
-func ExecuteGeneration() {
+func Generate(cmd *cobra.Command, args []string) {
 
 	data, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {

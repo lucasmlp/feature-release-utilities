@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/lucasmlp/release-yaml-utils/cmd/chartcli/execute"
-	"github.com/lucasmlp/release-yaml-utils/pkg/release"
 	"github.com/spf13/cobra"
 )
 
@@ -16,9 +15,13 @@ var rootCmd = &cobra.Command{
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate the filtered and updated chart files",
-	Run: func(cmd *cobra.Command, args []string) {
-		execute.ExecuteGeneration()
-	},
+	Run:   execute.Generate,
+}
+
+var toBeReleasedCmd = &cobra.Command{
+	Use:   "tobereleased",
+	Short: "Generates a toBeReleased.yaml file with charts that have not been released.",
+	Run:   execute.ToBeReleased,
 }
 
 var countCmd = &cobra.Command{
@@ -35,10 +38,9 @@ var mergeCmd = &cobra.Command{
 
 func main() {
 	rootCmd.AddCommand(generateCmd)
-	rootCmd.AddCommand(release.ToBeReleasedCmd)
+	rootCmd.AddCommand(toBeReleasedCmd)
 	rootCmd.AddCommand(countCmd)
 	rootCmd.AddCommand(mergeCmd)
-	release.ToBeReleasedCmd.Flags().StringVarP(&release.ReleasedFilePath, "released", "r", "released.yaml", "Path to the released.yaml file.")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("Error executing CLI command: %v", err)
