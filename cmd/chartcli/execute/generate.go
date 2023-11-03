@@ -1,4 +1,4 @@
-package release
+package execute
 
 import (
 	"fmt"
@@ -7,21 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/cobra"
-
 	"github.com/lucasmlp/release-yaml-utils/pkg/git"
 	"github.com/lucasmlp/release-yaml-utils/pkg/utils"
 )
 
-var GenerateCmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Generate the filtered and updated chart files",
-	Run: func(cmd *cobra.Command, args []string) {
-		executeGeneration()
-	},
-}
-
-func executeGeneration() {
+func ExecuteGeneration() {
 
 	data, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {

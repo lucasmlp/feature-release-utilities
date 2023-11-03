@@ -13,6 +13,14 @@ var rootCmd = &cobra.Command{
 	Short: "CLI tool for charts management",
 }
 
+var generateCmd = &cobra.Command{
+	Use:   "generate",
+	Short: "Generate the filtered and updated chart files",
+	Run: func(cmd *cobra.Command, args []string) {
+		execute.ExecuteGeneration()
+	},
+}
+
 var countCmd = &cobra.Command{
 	Use:   "count",
 	Short: "Count the number of versions for charts in release.yaml, released.yaml and toBeReleased.yaml",
@@ -26,7 +34,7 @@ var mergeCmd = &cobra.Command{
 }
 
 func main() {
-	rootCmd.AddCommand(release.GenerateCmd)
+	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(release.ToBeReleasedCmd)
 	rootCmd.AddCommand(countCmd)
 	rootCmd.AddCommand(mergeCmd)
