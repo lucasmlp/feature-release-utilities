@@ -8,6 +8,8 @@ all: build clean
 
 clean:
 	@rm -rf $(BUILD_DIR)
+	@find . -type f -name '*.log' -exec rm -f {} +
+	@test ! -f release.yaml || rm -f release.yaml
 
 build:
 	@mkdir -p $(BUILD_DIR)
