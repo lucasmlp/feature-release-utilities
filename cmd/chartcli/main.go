@@ -24,10 +24,14 @@ var toBeReleasedCmd = &cobra.Command{
 	Run:   execute.ToBeReleased,
 }
 
-var countCmd = &cobra.Command{
-	Use:   "count",
-	Short: "Count the number of versions for charts in release.yaml, released.yaml and toBeReleased.yaml",
-	Run:   execute.ExecuteCount,
+var formatCmd = &cobra.Command{
+	Use:   "format",
+	Short: "Backup and format yaml files",
+	Long: `The format command will:
+		- Backup yaml files by copying them to a bkp folder with a date time suffix
+		- Consolidate all equal chart names and versions
+		- Order them as in the original release.yaml file`,
+	Run: execute.Format,
 }
 
 var mergeCmd = &cobra.Command{
@@ -36,11 +40,18 @@ var mergeCmd = &cobra.Command{
 	Run:   execute.ExecuteMerge,
 }
 
+var countCmd = &cobra.Command{
+	Use:   "count",
+	Short: "Count the number of versions for charts in release.yaml, released.yaml and toBeReleased.yaml",
+	Run:   execute.ExecuteCount,
+}
+
 func main() {
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(toBeReleasedCmd)
-	rootCmd.AddCommand(countCmd)
+	rootCmd.AddCommand(formatCmd)
 	rootCmd.AddCommand(mergeCmd)
+	rootCmd.AddCommand(countCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("Error executing CLI command: %v", err)
