@@ -1,15 +1,27 @@
 package execute
 
 import (
-	"io/ioutil"
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/lucasmlp/release-yaml-utils/pkg/utils"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
 )
 
 func ToBeReleased(cmd *cobra.Command, args []string) {
+	bkpDir := "bkp"
+	timeSuffix := time.Now().Format("20060102-150405")
+
+	// Back up the file
+	bkpFile, err := backupFile(utils.ReleasedFilePath, bkpDir, timeSuffix)
+	if err != nil {
+		fmt.Printf("Failed to backup file %s: %v\n", utils.ReleasedFilePath, err)
+		return
+	}
+
+	fmt.Printf("Backed up %s file to %s\n", utils.ReleasedFilePath, bkpFile)
+
 	releaseData, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {
 		log.Fatalf("Error reading release.yaml: %v", err)
@@ -34,13 +46,28 @@ func ToBeReleased(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	toBeReleasedBytes, err := yaml.Marshal(toBeReleasedData)
+	// Consolidate versions and count duplicates
+	consolidatedData, duplicates := consolidateVersions(toBeReleasedData)
+
+	// Print the number of duplicates
+	fmt.Printf("File %s had %d duplicated chart/versions\n", utils.ToBeReleasedFilePath, duplicates)
+
+	// Load release.yaml to determine the order
+	releaseOrder, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {
-		log.Fatalf("Error marshaling toBeReleasedData to YAML: %v", err)
+		fmt.Printf("Failed to read release.yaml: %v\n", err)
+		return
 	}
 
-	err = ioutil.WriteFile("toBeReleased.yaml", toBeReleasedBytes, 0644)
+	// Sort the data according to the release order
+	sortReleaseData(&consolidatedData, &releaseOrder)
+
+	// Write the sorted data back to the file
+	err = utils.WriteYaml(utils.ToBeReleasedFilePath, consolidatedData)
 	if err != nil {
-		log.Fatalf("Error writing toBeReleased.yaml: %v", err)
+		fmt.Printf("Failed to write sorted data to %s: %v\n", utils.ReleasedFilePath, err)
+		return
 	}
+
+	fmt.Printf("Generated, consolidated and sorted %s\n", utils.ToBeReleasedFilePath)
 }
