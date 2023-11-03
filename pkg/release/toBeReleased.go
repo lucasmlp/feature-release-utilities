@@ -7,7 +7,6 @@ import (
 	"github.com/lucasmlp/release-yaml-utils/pkg/utils"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	// ... other imports ...
 )
 
 var ReleasedFilePath = "released.yaml"
@@ -19,7 +18,7 @@ var ToBeReleasedCmd = &cobra.Command{
 }
 
 func executeToBeReleased(cmd *cobra.Command, args []string) {
-	releaseData, err := utils.ReadYaml(releaseFilePath)
+	releaseData, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {
 		log.Fatalf("Error reading release.yaml: %v", err)
 	}

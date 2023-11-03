@@ -13,13 +13,6 @@ import (
 	"github.com/lucasmlp/release-yaml-utils/pkg/utils"
 )
 
-// ... other imports ...
-
-var (
-	releaseFilePath = "/Users/machado/development/suse/charts/release.yaml"
-	assetsDir       = "/Users/machado/development/suse/charts/assets"
-)
-
 var GenerateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate the filtered and updated chart files",
@@ -30,7 +23,7 @@ var GenerateCmd = &cobra.Command{
 
 func executeGeneration() {
 
-	data, err := utils.ReadYaml(releaseFilePath)
+	data, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {
 		log.Fatalf("Error reading release.yaml: %v", err)
 	}
@@ -39,7 +32,7 @@ func executeGeneration() {
 	for chart, versions := range data {
 		for _, version := range versions {
 			filename := fmt.Sprintf("%s-%s.tgz", chart, version)
-			filePath := filepath.Join(assetsDir, chart, filename)
+			filePath := filepath.Join(utils.AssetsDir, chart, filename)
 			commitMsg, err := git.CheckLastCommitMessage(filePath)
 			if err != nil {
 				log.Printf("Error checking commit for %s: %v\n", filename, err)

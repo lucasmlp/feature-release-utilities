@@ -7,9 +7,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var ReleaseFilePath = "/Users/machado/development/suse/charts/release.yaml"
+var OriginalReleaseFilePath = "/Users/machado/development/suse/charts/release.yaml"
+var MergedReleaseFilePath = "release.yaml"
 var ReleasedFilePath = "released.yaml"
 var ToBeReleasedFilePath = "toBeReleased.yaml"
+var AssetsDir = "/Users/machado/development/suse/charts/assets"
 
 func Contains(slice []string, item string) bool {
 	for _, a := range slice {

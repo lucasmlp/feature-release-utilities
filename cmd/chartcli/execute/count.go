@@ -9,7 +9,7 @@ import (
 )
 
 func ExecuteCount(cmd *cobra.Command, args []string) {
-	releaseData, err := utils.ReadYaml(utils.ReleaseFilePath)
+	releaseData, err := utils.ReadYaml(utils.OriginalReleaseFilePath)
 	if err != nil {
 		log.Fatalf("Error reading release.yaml: %v", err)
 	}
