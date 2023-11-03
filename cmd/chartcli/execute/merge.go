@@ -73,41 +73,6 @@ func mergeReleaseData(releasedData, toBeReleasedData models.ReleaseData) models.
 	return mergedData
 }
 
-// PrintDifferences will print the differences between two ReleaseData maps.
-func printDifferences(originalData, newData models.ReleaseData) {
-	log.Println("Differences (present in merged release.yaml but not in original one):")
-	for chart, versions := range newData {
-		originalVersions, ok := originalData[chart]
-		if !ok {
-			// If the chart does not exist at all in the original data, print all versions
-			log.Printf("New chart added: %s with versions %v\n", chart, versions)
-			continue
-		}
-
-		for _, version := range versions {
-			if !utils.Contains(originalVersions, version) {
-				log.Printf("New version for chart %s: %s\n", chart, version)
-			}
-		}
-	}
-
-	log.Println("Differences (present in original release.yaml but not in merged one):")
-	for chart, versions := range originalData {
-		newVersions, ok := newData[chart]
-		if !ok {
-			// If the chart does not exist in the new data, print all versions from the original
-			log.Printf("Chart removed: %s with versions %v\n", chart, versions)
-			continue
-		}
-
-		for _, version := range versions {
-			if !utils.Contains(newVersions, version) {
-				log.Printf("Version removed for chart %s: %s\n", chart, version)
-			}
-		}
-	}
-}
-
 // SortReleaseData sorts the data in releaseData to match the order of charts and versions in sortOrderData.
 func sortReleaseData(releaseData, sortOrderData *models.ReleaseData) {
 	for chart, versions := range *releaseData {
@@ -122,6 +87,35 @@ func sortReleaseData(releaseData, sortOrderData *models.ReleaseData) {
 		} else {
 			// If the chart is not found in sortOrderData, just sort it alphabetically
 			sort.Strings(versions)
+		}
+	}
+}
+
+// printDifferences will compare the original and new release data and
+// print the differences between them as specified.
+func printDifferences(originalData, newData models.ReleaseData) {
+	printUniqueVersions("Only in original release.yaml file:", originalData, newData)
+	printUniqueVersions("Only in merged release.yaml file:", newData, originalData)
+}
+
+// printUniqueVersions prints versions that are in `source` but not in `target`.
+func printUniqueVersions(message string, source, target models.ReleaseData) {
+	log.Println(message)
+	for chart, sourceVersions := range source {
+		targetVersions, exists := target[chart]
+
+		if !exists {
+			// If the chart does not exist at all in target, print all versions from source
+			for _, version := range sourceVersions {
+				log.Printf("  %s: %s\n", chart, version)
+			}
+		} else {
+			// Print versions that are unique to source
+			for _, version := range sourceVersions {
+				if !utils.Contains(targetVersions, version) {
+					log.Printf("  %s: %s\n", chart, version)
+				}
+			}
 		}
 	}
 }
