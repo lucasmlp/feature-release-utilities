@@ -24,13 +24,19 @@ func ExecuteCount(cmd *cobra.Command, args []string) {
 		log.Fatalf("Error reading toBeReleased.yaml: %v", err)
 	}
 
+	mergedReleaseData, err := utils.ReadYaml(utils.MergedReleaseFilePath)
+	if err != nil {
+		log.Fatalf("Error reading merged release.yaml: %v", err)
+	}
 	releaseCount := countVersions(releaseData)
 	releasedCount := countVersions(releasedData)
 	toBeReleasedCount := countVersions(toBeReleasedData)
+	mergedReleaseCount := countVersions(mergedReleaseData)
 
 	log.Printf("Number of versions in release.yaml: %d\n", releaseCount)
 	log.Printf("Number of versions in released.yaml: %d\n", releasedCount)
 	log.Printf("Number of versions in toBeReleased.yaml: %d\n", toBeReleasedCount)
+	log.Printf("Number of versions in merged release.yaml: %d\n", mergedReleaseCount)
 }
 
 func countVersions(data models.ReleaseData) int {
