@@ -17,16 +17,6 @@ longhorn-crd:
 prometheus-federator:
   - 0.3.0+up0.3.3
   - 103.0.0+up0.4.0
-rancher-backup:
-  - 102.0.2+up3.1.2
-  - 103.0.0+up4.0.0
-rancher-backup-crd:
-  - 102.0.2+up3.1.2
-  - 103.0.0+up4.0.0
-rancher-gatekeeper:
-  - 103.1.0+up3.13.0
-rancher-gatekeeper-crd:
-  - 103.1.0+up3.13.0
 rancher-istio:
   - 102.3.0+up1.18.2
   - 103.2.0+up1.19.0
@@ -41,7 +31,3 @@ rancher-project-monitoring:
   - 0.3.0+up0.3.3
 rancher-pushprox:
   - 103.0.0
-sriov:
-  - 103.0.0+up0.1.0
-sriov-crd:
-  - 103.0.0+up0.1.0
