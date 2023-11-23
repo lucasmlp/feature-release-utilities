@@ -1,10 +1,4 @@
-prometheus-federator:
-  - 103.0.0+up0.4.0
-rancher-istio:
-  - 103.2.0+up1.19.0
-rancher-monitoring:
-  - 103.0.0+up45.31.1
-rancher-monitoring-crd:
-  - 103.0.0+up45.31.1
-rancher-pushprox:
-  - 103.0.0
+longhorn:
+  - 103.2.1+up1.5.3
+longhorn-crd:
+  - 103.2.1+up1.5.3
